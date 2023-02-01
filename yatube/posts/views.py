@@ -1,9 +1,21 @@
-from django.shortcuts import HttpResponse
+from django.shortcuts import render, get_object_or_404
+from django.conf import settings
+from .models import Post, Group
 
 
 def index(request):
-    return HttpResponse('<h1>Index</h1>')
+    posts = Post.objects.all()[:settings.POSTS_PER_PAGE]
+    context = {
+        'posts': posts
+    }
+    return render(request, 'posts/index.html', context)
 
 
 def group_posts(request, slug):
-    return HttpResponse(f'<h1>{slug}</h1>')
+    group = get_object_or_404(Group, slug=slug)
+    posts = group.posts.all()[:settings.POSTS_PER_PAGE]
+    context = {
+        'posts': posts,
+        'group': group,
+    }
+    return render(request, 'posts/group_list.html', context)
